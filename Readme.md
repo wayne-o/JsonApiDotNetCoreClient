@@ -3,13 +3,17 @@
 ##  What
 Some classes to use JADNC as a client rather than a server. 
 
+Checkout https://rs-finance.visualstudio.com/_git/nmbrs for more examples (next to those below) of usage
+
 Todo: 
 * M2F also has an extra piece in the JADNC that supports Bulk request. I did not yet extract that piece of code into this "package" (repo).
 ## How
 
+### Clone the repo into your project
+:point_up_2:
 
 ### Configure in startup
-First, configure JADNC as a client in `startup.cs`.
+Secondly, configure JADNC as a client in `startup.cs`.
 ```c#
 using  <your-namespace>.Extensions.JsonApiClient;
 public void ConfigureServices(IServiceCollection services)
