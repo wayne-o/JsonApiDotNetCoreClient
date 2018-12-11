@@ -130,10 +130,13 @@ namespace nmbrs.Extensions.JsonApiClient
         protected Document RemoveLinks(Document document)
         {
             document.Links = null;
-            foreach (var entry in document.Data.Relationships)
+            if (document.Data.Relationships != null)
             {
-                var relation = entry.Value;
-                relation.Links = null;
+                foreach (var entry in document.Data.Relationships)
+                {
+                    var relation = entry.Value;
+                    relation.Links = null;
+                }
             }
             return document;
         }
