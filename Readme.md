@@ -50,19 +50,6 @@ void ConfigureApiClients()
     _services.AddScoped<IJsonApiClientSerializer<Run>, JsonApiClientSerializer<Run>>();
 }
 ```
-### Define a model
-(Almost) as usual, you'll have to define a model. One thing: add the following attribute as seen below.
-```c#
-[Links(Link.None)]    // <---- this needs to be added for serialization to work, ie when sending JA data to your api.
-public  class  Client  :  Identifiable<Guid>  
-{    
-    [Attr("number")]  
-    public  int  Number  {  get;  set;  }  
-    [Attr("name")]  
-    public  string  Name  {  get;  set;  }  
-}
-```
-
 
 
 ### Implement deriving classes of `JsonApiClient<TEntity, TId>`

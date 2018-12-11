@@ -122,8 +122,20 @@ namespace nmbrs.Extensions.JsonApiClient
         protected string SerializeDocument(object entity)
         {
             var identifiableEntity = entity as IIdentifiable;
-            var document = _documentBuilder.Build(identifiableEntity);
+            var document = RemoveLinks(_documentBuilder.Build(identifiableEntity));
             return _serialize(document);
+        }
+
+
+        protected Document RemoveLinks(Document document)
+        {
+            document.Links = null;
+            foreach (var entry in document.Data.Relationships)
+            {
+                var relation = entry.Value;
+                relation.Links = null;
+            }
+            return document;
         }
 
         protected string _serialize(object obj)
