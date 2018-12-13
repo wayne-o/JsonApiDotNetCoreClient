@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 
+
 namespace nmbrs.Extensions.JsonApiClient
 {
     /// <summary>

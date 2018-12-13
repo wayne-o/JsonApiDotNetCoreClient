@@ -22,6 +22,8 @@ namespace nmbrs.Extensions.JsonApiClient
 {
     public interface IJsonApiClient<TModel, TId>
     {
+
+        Task<IEnumerable<TModel>> CreateAsync(IEnumerable<TModel> entity, QueryParams queryParams = null);
         Task<TModel> CreateAsync(TModel entity, QueryParams queryParams = null);
         Task<bool> DeleteAsync(TId id, QueryParams queryParams = null);
         Task<IEnumerable<TModel>> GetAsync(QueryParams queryParams = null);
@@ -80,6 +82,11 @@ namespace nmbrs.Extensions.JsonApiClient
         public virtual Task<object> GetRelationshipsAsync(TId id, string relationshipName, QueryParams qp = null)
         {
             throw new NotImplementedException();
+        }
+
+        public virtual async Task<IEnumerable<TModel>> CreateAsync(IEnumerable<TModel> entities, QueryParams qp = null)
+        {
+            return await Task.WhenAll(entities.Select(e => CreateAsync(e, qp)));
         }
 
         public virtual async Task<TModel> CreateAsync(TModel entity, QueryParams qp = null)
