@@ -1,61 +1,62 @@
-# Json Api Client
 
-##  What
-Some classes to use JADNC as a client rather than a server. 
+# Json Api Client  
+  
+## What  
+Some classes to use JADNC as a client rather than as, or next to a server.  
+ 
+Some examples are described down here. A live implementation can be found [here](https://rs-finance.visualstudio.com/_git/nmbrs) (used as a client running in parallel to a server).
+  
+Todo:  
+* M2F also has an extra piece in the JADNC that supports Bulk request. I did not yet extract that piece of code into this "package".  
 
-Checkout https://rs-finance.visualstudio.com/_git/nmbrs for more examples (next to those below) of usage
-
-Todo: 
-* M2F also has an extra piece in the JADNC that supports Bulk request. I did not yet extract that piece of code into this "package" (repo).
 ## How
 
-### Clone the repo into your project
+### 1. Clone the repo into your project
 :point_up_2:
 
-### Configure in startup
-Secondly, configure JADNC as a client in `startup.cs`.
+### 2. Configure in startup
+Secondly, configure JADNC as a client in `startup.cs`. There is two ways of doing this
+
+#### 2a. Use JADNC as both a client and server
 ```c#
-using  <your-namespace>.Extensions.JsonApiClient;
-public void ConfigureServices(IServiceCollection services)
-{
-    ...
-    _services = services;
-    ConfigureJsonApiDotNetCore();
-    ConfigureRsApiClients();
-    ...
-}
-// This configures JADNC as a client. Note that there are two properties on the `options` object: core and client.
-// Core is used for normal JADNC configuration. Client is used for the client (in this case we're setting a api root adres).
-// Note that the AddJsonApiClient method takes care of some 
-// overhead introduced when isolating some JADNC components from the usual environment in which it is used (see comments ScopedService provider file).
 void ConfigureJsonApiDotNetCore()
 {
-    _services.AddJsonApiClient(options =>
+    // configuring the server as usual - nothing changed
+    _services.AddJsonApi<NmbrsDb>(options =>
     {
-        options.Client.BaseAddress = new Uri(Configuration.GetSection("YourJadncApiTargetUrl").Value);
-        options.Core.BuildResourceGraph((b) =>
-        {
+        options.BuildResourceGraph((b) => {
             b.AddResource<Client, Guid>("clients");
             b.AddResource<InfineTask, Guid>("infine-tasks");
         });
     });
-
+    // this adds the client on top
+    _services.AddJsonApiClient(options =>
+   {
+       options.BaseAddress = new Uri(Configuration.GetSection("RsApiUrl").Value);
+   });
 }
-void ConfigureApiClients()
-{
-    // register the Client Services that will consume your API
-    _services.AddScoped<IJsonApiClient<Client, Guid>, ClientService>();
-    _services.AddScoped<IJsonApiClient<InfineTask, Guid>, InfineTaskService>();
-    _services.AddScoped<IJsonApiClient<Run, int>, RunService>();
+```
+#### 2b. Use JADNC as a standalone client
+```c#
 
-    // We could do this this automatically based on the defined entities in the JANDC resource graph.
-    _services.AddScoped<IJsonApiClientSerializer<Client>, JsonApiClientSerializer<Client>>();
-    _services.AddScoped<IJsonApiClientSerializer<InfineTask>, JsonApiClientSerializer<InfineTask>>();
-    _services.AddScoped<IJsonApiClientSerializer<Run>, JsonApiClientSerializer<Run>>();
+void ConfigureJsonApiDotNetCore()
+{
+    // this initializes the server (core) as far as is required,
+    // taking into account that it some .net core features 
+    // might not be available, eg the MVC features when using a 
+    // console app.
+    _services.AddJsonApiClientStandAlone<NmbrsDb>(options =>
+    {
+        options.Core.BuildResourceGraph((b) => {
+            b.AddResource<Client, Guid>("clients");
+            b.AddResource<InfineTask, Guid>("infine-tasks");
+        });
+        options.Client.BaseAddress = new Uri(Configuration.GetSection("RsApiUrl").Value);
+    });
 }
 ```
 
-### Define a model
+### 3. Define a model
 (Almost) as usual, you'll have to define a model. One thing: add the following attribute as seen below.
 ```c#
 [Links(Link.None)]    // <---- this needs to be added for serialization to work, ie when sending JA data to your api.
@@ -69,13 +70,13 @@ public  class  Client  :  Identifiable<Guid>
 ```
 
 
-### Implement deriving classes of `JsonApiClient<TEntity, TId>`
+### 4. Implement deriving classes of `JsonApiClient<TEntity, TId>`
 
 Then, implement the `YourModelService`  api client service/consumer you require for your app. It has to extend `JsonApiClient<TEntity, TId>`.  The idea is that this class will be the base class for a client for any model, just like `DefaultResourceService` is in JADNC.  Right now, this class is still pretty empty, so you will need to make a "custom" implementation to fill in the logic. Later, when we have seen all the ins and outs of what we need, we should  generalize that and put in the `JsonApiClient` base class.
 
 As an example: check the implementation of `Client` in the `Nbmrs` microservice.
 
-### no auth example
+#### 4a. Example without auth
 ```c#
 using System;
 using System.Collections.Generic;
@@ -111,7 +112,7 @@ namespace nmbrs.ApiClientServices
 
 ```
 
-### with auth example
+#### 4b. Example using auth
 ```c#
 using System;
 using System.Collections.Generic;
@@ -151,7 +152,7 @@ namespace nmbrs.ApiClientServices
 
 ```
 
-### example sending data
+#### 4c. Example sending data
 The above two examples only pulls data from the api, the example below also sends it.
 ```c#
 
@@ -184,6 +185,18 @@ public class RunService : JsonApiClient<Run, int>, IJsonApiClient<Run, int>
 ```
 
 
+### 5. Register ApiClient implementations
+
+```c#
+// Registering actual clients, ie the classes that will do the communication with the API.
+void ConfigureApiClients()
+{
+    // register the Client Services that will consume your API
+    _services.AddScoped<IJsonApiClient<Client, Guid>, ClientService>();
+    _services.AddScoped<IJsonApiClient<InfineTask, Guid>, InfineTaskService>();
+    _services.AddScoped<IJsonApiClient<Run, int>, RunService>();
+}
+```
 
 
 
