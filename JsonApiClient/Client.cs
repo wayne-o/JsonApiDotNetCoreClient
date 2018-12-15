@@ -108,9 +108,9 @@ namespace JsonApiClient
         /// <param name="qp">Qp.</param>
         protected string CreateQueryParams(QueryParams qp)
         {
-        return "?" + string.Join("&",
-            qp.Select(kvp =>
-                string.Format("{0}={1}", kvp.Key, kvp.Value)));
+            return qp == null ? String.Empty : "?" + string.Join("&",
+                qp.Select(kvp =>
+                    string.Format("{0}={1}", kvp.Key, kvp.Value)));
         }
         /// <summary>
         /// Gets a token from the injected AuthProvider and adds it to the headers.
