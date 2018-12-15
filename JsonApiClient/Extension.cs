@@ -25,7 +25,7 @@ namespace nmbrs.Extensions.JsonApiClient
     /// </summary>
     public static class AddJsonApiClientExtension
     {
-        public static IServiceCollection AddJsonApiWithClient<TDbContext>(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action) where TDbContext : DbContext
+        public static IServiceCollection AddJsonApiClientStandAlone<TDbContext>(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action) where TDbContext : DbContext
         {
             var options = new JsonApiCoreWithClientOptions();
             services.AddJsonApiInternals<TDbContext>(options.Core);
@@ -33,7 +33,7 @@ namespace nmbrs.Extensions.JsonApiClient
             AddClientInternals(services, options.Client);
             return services;
         }
-        public static IServiceCollection AddJsonApiWithClient(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action)
+        public static IServiceCollection AddJsonApiClientStandAlone(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action)
         {
             var options = new JsonApiCoreWithClientOptions();
             services.AddJsonApiInternals(options.Core);
@@ -42,7 +42,7 @@ namespace nmbrs.Extensions.JsonApiClient
             return services;
         }
 
-        public static IServiceCollection AddJsonApiClientStandAlone(this IServiceCollection services, Action<ClientOptions> action)
+        public static IServiceCollection AddJsonApiClient(this IServiceCollection services, Action<ClientOptions> action)
         {
             var options = new ClientOptions();
             action(options);
