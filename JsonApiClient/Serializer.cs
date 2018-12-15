@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 
-namespace nmbrs.Extensions.JsonApiClient
+namespace JsonApiClient
 {
 
     public interface IJsonApiClientSerializer<T>

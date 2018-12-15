@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 
-namespace nmbrs.Extensions.JsonApiClient
+namespace JsonApiClient
 {    /// <summary>
      /// This custom implementation of IScopedServiceProvider is required to use JADNC as a client.
      /// Normally, ie when using JADNC as a server, JsonApiSerializer acquires IScopedServiceProvider through DI. The default implementation then depends on httpContextAccessor.HttpContext.

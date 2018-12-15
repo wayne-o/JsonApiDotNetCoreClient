@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 
 
 
-namespace nmbrs.Extensions.JsonApiClient
+namespace JsonApiClient
 {
     /// <summary>
     /// TODO make generically usable version of JsonApiSerializer  (ClientSerialize)

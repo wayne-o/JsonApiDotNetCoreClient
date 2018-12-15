@@ -1,7 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace nmbrs.Extensions.JsonApiClient
+namespace JsonApiClient
 {
     public interface IJsonApiClientAuthProvider
     {
