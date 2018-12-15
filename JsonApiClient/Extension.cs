@@ -25,22 +25,18 @@ namespace JsonApiClient
     /// </summary>
     public static class AddJsonApiClientExtension
     {
-        public static IServiceCollection AddJsonApiCoreWithClient<TDbContext>(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action) where TDbContext : DbContext
+        public static IServiceCollection AddJsonApiClientStandAlone<TDbContext>(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action) where TDbContext : DbContext
         {
             var options = new JsonApiCoreWithClientOptions();
-            var coreOptions = options.Core;
-
-            services.AddJsonApiInternals<TDbContext>(coreOptions);
+            services.AddJsonApiInternals<TDbContext>(options.Core);
             action(options);
             AddClientInternals(services, options.Client);
             return services;
         }
-        public static IServiceCollection AddJsonApiCoreWithClient(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action)
+        public static IServiceCollection AddJsonApiClientStandAlone(this IServiceCollection services, Action<JsonApiCoreWithClientOptions> action)
         {
             var options = new JsonApiCoreWithClientOptions();
-            var coreOptions = options.Core;
-
-            services.AddJsonApiInternals(coreOptions);
+            services.AddJsonApiInternals(options.Core);
             action(options);
             AddClientInternals(services, options.Client);
             return services;
@@ -59,6 +55,7 @@ namespace JsonApiClient
             {
                 BaseAddress = options.BaseAddress
             };
+            services.AddScoped(typeof(IJsonApiClientSerializer<>), typeof(JsonApiClientSerializer<>));
             ServicePointManager.FindServicePoint(options.BaseAddress).ConnectionLeaseTimeout = 60000;
             services.AddSingleton(httpClient);
             services.AddScoped<IScopedServiceProvider, JsonApiClientScopedServiceProvider>();
