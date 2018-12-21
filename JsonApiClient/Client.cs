@@ -5,8 +5,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Extensions;
+using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Models;
 using JsonApiDotNetCore.Serialization;
+using Newtonsoft.Json;
 using QueryParams = System.Collections.Generic.Dictionary<string, string>;
 
 
@@ -37,17 +39,24 @@ namespace JsonApiClient
     ///  ater on, when we have a better overview of the different implemen
     /// 
     /// </summary>
-    public abstract class JsonApiClient<TModel, TId> : IJsonApiClient<TModel, TId>
+    public class JsonApiClient<TModel, TId> : IJsonApiClient<TModel, TId>
     {
-  
+
+
+        protected readonly string _endPoint;
+
         protected readonly HttpClient _httpClient;
         protected readonly IJsonApiDeSerializer _deserializer;
         protected readonly IJsonApiClientSerializer<TModel> _serializer;
         protected readonly IJsonApiClientAuthProvider _authProvider;
-        protected JsonApiClient(
+        private readonly IResourceGraph _contextGraph;
+
+        public JsonApiClient(
+
             HttpClient httpClient,
             IJsonApiDeSerializer deserializer,
             IJsonApiClientSerializer<TModel> serializer,
+            IResourceGraph contextGraph,
             IJsonApiClientAuthProvider authProvider = null
         )
         {
@@ -55,11 +64,19 @@ namespace JsonApiClient
             _httpClient = httpClient;
             _serializer = serializer;
             _authProvider = authProvider;
+            _contextGraph = contextGraph;
+
+            var contextEntity = contextGraph.GetContextEntity(typeof(TModel));
+            _endPoint = contextEntity.EntityName;
         }
 
         public virtual async Task<IEnumerable<TModel>> GetAsync(QueryParams qp = null)
         {
-            throw new NotImplementedException();
+            var auth = await AddAuthIfAvailable();
+            var url = _endPoint + CreateQueryParams(qp);
+            string requestBody = await _httpClient.GetStringAsync(url);
+            Documents documents = JsonConvert.DeserializeObject<Documents>(requestBody);
+            return _deserializer.DeserializeList<TModel>(requestBody);
         }
         public virtual async Task<TModel> GetAsync(TId id, QueryParams qp = null)
         {

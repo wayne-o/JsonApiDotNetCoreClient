@@ -56,6 +56,7 @@ namespace JsonApiClient
                 BaseAddress = options.BaseAddress
             };
             services.AddScoped(typeof(IJsonApiClientSerializer<>), typeof(JsonApiClientSerializer<>));
+            services.AddScoped(typeof(IJsonApiClient<,>), typeof(JsonApiClient<,>));
             ServicePointManager.FindServicePoint(options.BaseAddress).ConnectionLeaseTimeout = 60000;
             services.AddSingleton(httpClient);
             services.AddScoped<IScopedServiceProvider, JsonApiClientScopedServiceProvider>();
