@@ -60,6 +60,8 @@ namespace JsonApiClient
             ServicePointManager.FindServicePoint(options.BaseAddress).ConnectionLeaseTimeout = 60000;
             services.AddSingleton(httpClient);
             services.AddScoped<IScopedServiceProvider, JsonApiClientScopedServiceProvider>();
+            services.AddScoped<IClientDocumentBuilder, ClientDocumentBuilder>();
+
         }
     }
 

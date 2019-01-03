@@ -100,7 +100,9 @@ namespace JsonApiClient
 
         public virtual async Task<TModel> CreateAsync(TModel entity, QueryParams qp = null)
         {
-            throw new NotImplementedException();
+            //var auth = await AddAuthIfAvailable();
+            string document = _serializer.Serialize(entity);
+            return entity;
         }
 
         public virtual Task<bool> DeleteAsync(TId id, QueryParams qp = null)

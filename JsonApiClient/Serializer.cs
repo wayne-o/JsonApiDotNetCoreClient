@@ -32,7 +32,7 @@ namespace JsonApiClient
     public class JsonApiClientSerializer<T> : IJsonApiClientSerializer<T>
     {
 
-        private readonly IDocumentBuilder _documentBuilder;
+        private readonly IClientDocumentBuilder _documentBuilder;
         private readonly ILogger<JsonApiSerializer> _logger;
         private readonly IJsonApiContext _jsonApiContext;
         private readonly IResourceGraph _contextGraph;
@@ -40,7 +40,7 @@ namespace JsonApiClient
 
         public JsonApiClientSerializer(
             IJsonApiContext jsonApiContext,
-            IDocumentBuilder documentBuilder,
+            IClientDocumentBuilder documentBuilder,
             IResourceGraph contextGraph)
         {
             _jsonApiContext = jsonApiContext;
@@ -50,7 +50,7 @@ namespace JsonApiClient
 
         public JsonApiClientSerializer(
             IJsonApiContext jsonApiContext,
-            IDocumentBuilder documentBuilder,
+            IClientDocumentBuilder documentBuilder,
             ILoggerFactory loggerFactory,
             IResourceGraph contextGraph)
         {
@@ -81,7 +81,7 @@ namespace JsonApiClient
             if (entity == null)
                 return GetNullDataResponse();
 
-            if (entity.GetType() == typeof(ErrorCollection) || (_jsonApiContext.RequestEntity == null && _jsonApiContext.IsBulkOperationRequest == false))
+            if (entity.GetType() == typeof(ErrorCollection) )
                 return GetErrorJson(entity, _logger);
 
             return null;
