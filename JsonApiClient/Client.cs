@@ -102,6 +102,12 @@ namespace JsonApiClient
         {
             //var auth = await AddAuthIfAvailable();
             string document = _serializer.Serialize(entity);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _endPoint)
+            {
+                Content = new StringContent(document)
+            };
+            SetContentType(request);
+            var response = await _httpClient.SendAsync(request);
             return entity;
         }
 
